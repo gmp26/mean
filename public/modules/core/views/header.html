@@ -6,21 +6,21 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a href="/#!/" class="navbar-brand">MEAN.JS</a>
+		<a href="/mean/#!/" class="navbar-brand">MEAN.JS</a>
 	</div>
 	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
 		<ul class="nav navbar-nav" data-ng-show="authentication.user">
 			<li data-ng-repeat="item in menu" data-ng-show="authentication.user" ui-route="{{item.uiRoute}}" ng-class="{active: $uiRoute}">
-				<a href="/#!/{{item.link}}">{{item.title}}</a>
+				<a href="/mean/#!/{{item.link}}">{{item.title}}</a>
 			</li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right" data-ng-hide="authentication.user">
-			<li ui-route="/signup" ng-class="{active: $uiRoute}">
-				<a href="/#!/signup">Signup</a>
+			<li ui-route="/mean/signup" ng-class="{active: $uiRoute}">
+				<a href="/mean/#!/signup">Signup</a>
 			</li>
 			<li class="divider-vertical"></li>
-			<li ui-route="/signin" ng-class="{active: $uiRoute}">
-				<a href="/#!/signin">Signin</a>
+			<li ui-route="/mean/signin" ng-class="{active: $uiRoute}">
+				<a href="/mean/#!/signin">Signin</a>
 			</li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.user">
@@ -30,17 +30,17 @@
                 </a>
 				<ul class="dropdown-menu">
 					<li>
-						<a href="/#!/settings/profile">Edit Profile</a>
+						<a href="/mean/#!/settings/profile">Edit Profile</a>
 					</li>
 					<li>
-						<a href="/#!/settings/accounts">Manage Social Accounts</a>
+						<a href="/mean/#!/settings/accounts">Manage Social Accounts</a>
 					</li>
 					<li data-ng-show="authentication.user.provider === 'local'">
-						<a href="/#!/settings/password">Change Password</a>
+						<a href="/mean/#!/settings/password">Change Password</a>
 					</li>
 					<li class="divider"></li>
 					<li>
-						<a href="/auth/signout">Signout</a>
+						<a href="/mean/auth/signout">Signout</a>
 					</li>
 				</ul>
 			</li>

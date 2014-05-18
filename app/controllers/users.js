@@ -201,14 +201,14 @@ exports.oauthCallback = function(strategy) {
 	return function(req, res, next) {
 		passport.authenticate(strategy, function(err, user, redirectURL) {
 			if (err || !user) {
-				return res.redirect('/#!/signin');
+				return res.redirect('/mean/#!/signin');
 			}
 			req.login(user, function(err) {
 				if (err) {
-					return res.redirect('/#!/signin');
+					return res.redirect('/mean/#!/signin');
 				}
 
-				return res.redirect(redirectURL || '/');
+				return res.redirect(redirectURL || '/mean/');
 			});
 		})(req, res, next);
 	};

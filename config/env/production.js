@@ -5,21 +5,21 @@ module.exports = {
 	facebook: {
 		clientID: 'APP_ID',
 		clientSecret: 'APP_SECRET',
-		callbackURL: 'http://localhost:3000/auth/facebook/callback'
+		callbackURL: 'https://cmep.maths.org/mean/auth/facebook/callback'
 	},
 	twitter: {
 		clientID: 'CONSUMER_KEY',
 		clientSecret: 'CONSUMER_SECRET',
-		callbackURL: 'http://localhost:3000/auth/twitter/callback'
+		callbackURL: 'https://cmep.maths.org/mean/auth/twitter/callback'
 	},
 	google: {
 		clientID: 'APP_ID',
 		clientSecret: 'APP_SECRET',
-		callbackURL: 'http://localhost:3000/auth/google/callback'
+		callbackURL: 'https://cmep.maths.org/mean/auth/google/callback'
 	},
 	linkedin: {
 		clientID: 'APP_ID',
 		clientSecret: 'APP_SECRET',
-		callbackURL: 'http://localhost:3000/auth/linkedin/callback'
+		callbackURL: 'https://cmep.maths.org/mean/auth/linkedin/callback'
 	}
 };
