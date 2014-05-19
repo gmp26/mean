@@ -1,7 +1,7 @@
 [![MEAN.JS Logo](http://meanjs.org/img/logo-small.png)](http://meanjs.org/)
 
-[![Build Status](https://travis-ci.org/meanjs/mean.png?branch=master)](https://travis-ci.org/meanjs/mean)
-[![Dependencies Status](https://david-dm.org/meanjs/mean.png)](https://david-dm.org/meanjs/mean)
+[![Build Status](https://travis-ci.org/meanjs/mean.svg?branch=master)](https://travis-ci.org/meanjs/mean)
+[![Dependencies Status](https://david-dm.org/meanjs/mean.svg)](https://david-dm.org/meanjs/mean)
 
 MEAN.JS is a full-stack JavaScript open-source solution, which provides a solid starting point for [MongoDB](http://www.mongodb.org/), [Node.js](http://www.nodejs.org/), [Express](http://expressjs.com/), and [AngularJS](http://angularjs.org/) based applications. The idea is to solve the common issues with connecting those frameworks, build a robust framework to support daily development needs, and help developers use better practices while working with popular JavaScript components. 
 
@@ -92,6 +92,7 @@ Browse the live MEAN.JS example on [http://meanjs.herokuapp.com](http://meanjs.h
 
 ## Credits
 Inspired by the great work of [Madhusudhan Srinivasa](https://github.com/madhums/)
+The MEAN name was coined by [Valeri Karpov](http://blog.mongodb.org/post/49262866911/the-mean-stack-mongodb-expressjs-angularjs-and)
 
 ## License
 (The MIT License)
