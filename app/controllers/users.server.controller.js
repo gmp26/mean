@@ -21,7 +21,7 @@ var getErrorMessage = function(err) {
 				message = 'Username already exists';
 				break;
 			default:
-				message = 'Something went wrong';
+				message = 'database error, code=' + err.code;
 		}
 	} else {
 		for (var errName in err.errors) {
@@ -46,6 +46,9 @@ exports.signup = function(req, res) {
 	// Add missing user fields
 	user.provider = 'local';
 	user.displayName = user.firstName + ' ' + user.lastName;
+
+	// We're going to use email as the username
+	user.username = user.email
 
 	// Then save the user 
 	user.save(function(err) {
