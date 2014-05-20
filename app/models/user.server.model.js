@@ -16,15 +16,15 @@ var validateLocalStrategyProperty = function(property) {
 
 var validateString40 = function(property) {
     return ((this.provider !== 'local' && !this.updated) || property.length <= 40);
-}
+};
 
 var validateString20 = function(property) {
     return ((this.provider !== 'local' && !this.updated) || property.length <= 20);
-}
+};
 
 var validateString10 = function(property) {
     return ((this.provider !== 'local' && !this.updated) || property.length <= 10);
-}
+};
 
 /**
  * A Validation function for local strategy password
@@ -64,7 +64,7 @@ var UserSchema = new Schema({
         type: String,
         unique: true,
         required: 'Please fill in a username',
-        match: [/.+\@.+\..+/, 'Please fill in a username']
+        match: [/.+\@.+\..+/, 'Please fill in a username'],
         trim: true
     },
     password: {
@@ -85,7 +85,7 @@ var UserSchema = new Schema({
         type: String,
         default: '',
         trim: true,
-        validate: [validateString40, "school name too long"]
+        validate: [validateString40, 'school name too long']
     },
     schooladdr1: {
         type: String,
@@ -106,13 +106,13 @@ var UserSchema = new Schema({
         type: String,
         default: '',
         trim: true,
-        validate: [validateString20, "school town too long"]
+        validate: [validateString20, 'school town too long']
     },
     schoolpostCode: {
         type: String,
         default: '',
         trim: true,
-        validate: [validateString10, "school post code too long"]
+        validate: [validateString10, 'school post code too long']
     },
     salt: {
         type: String

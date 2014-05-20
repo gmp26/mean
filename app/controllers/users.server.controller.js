@@ -53,7 +53,7 @@ exports.signup = function(req, res) {
     user.displayName = user.firstName + ' ' + user.lastName;
 
     if (s) {
-        user.schoolurn = "" + s.urn;
+        user.schoolurn = '' + s.urn;
         user.schoolname = s.name;
         user.schooladdr1 = s.addr1;
         user.schooladdr2 = s.addr2;
@@ -62,7 +62,7 @@ exports.signup = function(req, res) {
         user.schoolpostCode = s.postCode;
     }
 
-    if (user.username == '') {
+    if (user.username === '') {
         // Use email as username
         user.username = user.email;
     } else {
