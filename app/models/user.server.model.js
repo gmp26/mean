@@ -63,7 +63,8 @@ var UserSchema = new Schema({
     username: {
         type: String,
         unique: true,
-        required: 'Please fill in an email',
+        required: 'Please fill in a username',
+        match: [/.+\@.+\..+/, 'Please fill in a username']
         trim: true
     },
     password: {
