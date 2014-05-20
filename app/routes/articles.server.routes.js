@@ -8,11 +8,11 @@ var users = require('../../app/controllers/users'),
 
 module.exports = function(app) {
     // Article Routes
-    app.route('/mean/articles')
+    app.route('/articles')
         .get(articles.list)
         .post(users.requiresLogin, articles.create);
 
-    app.route('/mean/articles/:articleId')
+    app.route('/articles/:articleId')
         .get(articles.read)
         .put(users.requiresLogin, articles.hasAuthorization, articles.update)
         .delete(users.requiresLogin, articles.hasAuthorization, articles.delete);
