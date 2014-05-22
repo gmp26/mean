@@ -5,27 +5,27 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
         $scope.authentication = Authentication;
 
         //If user is signed in then redirect back home
-        if ($scope.authentication.user) $location.path('/');
+        if ($scope.authentication.user) $location.path('/mean');
 
         $scope.signup = function() {
-            $http.post('/auth/signup', $scope.credentials).success(function(response) {
+            $http.post('/mean/auth/signup', $scope.credentials).success(function(response) {
                 //If successful we assign the response to the global user model
                 $scope.authentication.user = response;
 
                 //And redirect to the index page
-                $location.path('/');
+                $location.path('/mean');
             }).error(function(response) {
                 $scope.error = response.message;
             });
         };
 
         $scope.signin = function() {
-            $http.post('/auth/signin', $scope.credentials).success(function(response) {
+            $http.post('/mean/auth/signin', $scope.credentials).success(function(response) {
                 //If successful we assign the response to the global user model
                 $scope.authentication.user = response;
 
                 //And redirect to the index page
-                $location.path('/');
+                $location.path('/mean');
             }).error(function(response) {
                 $scope.error = response.message;
             });
