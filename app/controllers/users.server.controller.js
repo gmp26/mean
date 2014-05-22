@@ -133,6 +133,7 @@ exports.update = function(req, res) {
         user = _.extend(user, req.body);
         user.updated = Date.now();
         user.displayName = user.firstName + ' ' + user.lastName;
+        user.username = user.email;
 
         user.save(function(err) {
             if (err) {
