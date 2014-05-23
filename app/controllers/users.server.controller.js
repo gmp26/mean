@@ -98,6 +98,8 @@ exports.signup = function(req, res) {
  * Signin after passport authentication
  */
 exports.signin = function(req, res, next) {
+    console.log('signin request');
+    console.log(util.inspect(req));
     passport.authenticate('local', function(err, user, info) {
         if (err || !user) {
             res.send(400, info);
