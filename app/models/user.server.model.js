@@ -33,6 +33,10 @@ var validateLocalStrategyPassword = function(password) {
     return (this.provider !== 'local' || (password && password.length > 6));
 };
 
+var validateAffiliated = function(checked) {
+    return (this.provider !== 'local' || !checked || this.schoolname != "")
+};
+
 /**
  * User Schema
  */
@@ -74,7 +78,8 @@ var UserSchema = new Schema({
     },
     affiliated: {
         type: Boolean,
-        default: false
+        default: false,
+        validate: [validateAffiliated, 'Please enter school details']
     },
     schoolurn: {
         type: String,
@@ -90,17 +95,20 @@ var UserSchema = new Schema({
     schooladdr1: {
         type: String,
         default: '',
-        trim: true
+        trim: true,
+        validate: [validateString40, 'school address line 1 too long']
     },
     schooladdr2: {
         type: String,
         default: '',
-        trim: true
+        trim: true,
+        validate: [validateString40, 'school address line 2 too long']
     },
     schooladdr3: {
         type: String,
         default: '',
-        trim: true
+        trim: true,
+        validate: [validateString40, 'school address line 3 too long']
     },
     schooltown: {
         type: String,
