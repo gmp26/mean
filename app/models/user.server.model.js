@@ -14,17 +14,33 @@ var validateLocalStrategyProperty = function(property) {
     return ((this.provider !== 'local' && !this.updated) || property.length);
 };
 
-var validateString40 = function(property) {
-    return ((this.provider !== 'local' && !this.updated) || property.length <= 40);
+var validateStringLength = function(limit) {
+    return function(property) {
+        ((this.provider !== 'local' && !this.updated) || property.length <= limit);
+    }
 };
 
-var validateString20 = function(property) {
-    return ((this.provider !== 'local' && !this.updated) || property.length <= 20);
-};
+var validateString80 = validateStringLength(80);
+var validateString60 = validateStringLength(60);
+var validateString40 = validateStringLength(40);
+var validateString20 = validateStringLength(20);
+var validateString10 = validateStringLength(10);
 
-var validateString10 = function(property) {
-    return ((this.provider !== 'local' && !this.updated) || property.length <= 10);
-};
+// var validateString60 = function(property) {
+//     return ((this.provider !== 'local' && !this.updated) || property.length <= 60);
+// };
+
+// var validateString40 = function(property) {
+//     return ((this.provider !== 'local' && !this.updated) || property.length <= 40);
+// };
+
+// var validateString20 = function(property) {
+//     return ((this.provider !== 'local' && !this.updated) || property.length <= 20);
+// };
+
+// var validateString10 = function(property) {
+//     return ((this.provider !== 'local' && !this.updated) || property.length <= 10);
+// };
 
 /**
  * A Validation function for local strategy password
@@ -34,24 +50,36 @@ var validateLocalStrategyPassword = function(password) {
 };
 
 var validateAffiliated = function(checked) {
-    return (this.provider !== 'local' || !checked || this.schoolname != "")
+    return (this.provider !== 'local' || !checked || this.schoolname !== '');
+};
+
+var validateTitle = function(title) {
+    console.log("title=" + title);
+    console.log("isValid = " + ['MrMrsMsMissDr'].indexOf(title));
+    return (this.provider !== 'local' || 'MrMrsMsMissDr'.indexOf(title) >= 0);
 };
 
 /**
  * User Schema
  */
 var UserSchema = new Schema({
+    title: {
+        type: String,
+        trim: true,
+        default: 'Mr.',
+        validate: [validateTitle, 'Please provide a valid title']
+    },
     firstName: {
         type: String,
         trim: true,
         default: '',
-        validate: [validateLocalStrategyProperty, 'Please fill in your first name']
+        validate: [validateString40, 'Please fill in your first name']
     },
     lastName: {
         type: String,
         trim: true,
         default: '',
-        validate: [validateLocalStrategyProperty, 'Please fill in your last name']
+        validate: [validateString40, 'Please fill in your last name']
     },
     displayName: {
         type: String,
@@ -61,7 +89,7 @@ var UserSchema = new Schema({
         type: String,
         trim: true,
         default: '',
-        validate: [validateLocalStrategyProperty, 'Please fill in your email'],
+        validate: [validateString60, 'Please fill in your email'],
         match: [/.+\@.+\..+/, 'Please fill a valid email address']
     },
     username: {
@@ -90,31 +118,31 @@ var UserSchema = new Schema({
         type: String,
         default: '',
         trim: true,
-        validate: [validateString40, 'school name too long']
+        validate: [validateString80, 'school name too long']
     },
     schooladdr1: {
         type: String,
         default: '',
         trim: true,
-        validate: [validateString40, 'school address line 1 too long']
+        validate: [validateString60, 'school address line 1 too long']
     },
     schooladdr2: {
         type: String,
         default: '',
         trim: true,
-        validate: [validateString40, 'school address line 2 too long']
+        validate: [validateString60, 'school address line 2 too long']
     },
     schooladdr3: {
         type: String,
         default: '',
         trim: true,
-        validate: [validateString40, 'school address line 3 too long']
+        validate: [validateString60, 'school address line 3 too long']
     },
     schooltown: {
         type: String,
         default: '',
         trim: true,
-        validate: [validateString20, 'school town too long']
+        validate: [validateString40, 'school town too long']
     },
     schoolpostCode: {
         type: String,

@@ -39,7 +39,6 @@ var getErrorMessage = function(err) {
  */
 exports.signup = function(req, res) {
     // For security measurement we remove the roles from the req.body object
-    console.log(util.inspect(req));
 
     delete req.body.roles;
 
@@ -70,8 +69,6 @@ exports.signup = function(req, res) {
         user.username = 'bot';
     }
 
-    console.log(util.inspect(user));
-
     // Then save the user 
     user.save(function(err) {
         if (err) {
@@ -99,7 +96,6 @@ exports.signup = function(req, res) {
  */
 exports.signin = function(req, res, next) {
     console.log('signin request');
-    console.log(util.inspect(req));
     passport.authenticate('local', function(err, user, info) {
         if (err || !user) {
             res.send(400, info);
@@ -218,8 +214,11 @@ exports.changePassword = function(req, res, next) {
  * Signout
  */
 exports.signout = function(req, res) {
+    console.log('signout called');
     req.logout();
-    res.redirect('/');
+    // force page reload so user data will update
+    res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    res.redirect('back');
 };
 
 /**
