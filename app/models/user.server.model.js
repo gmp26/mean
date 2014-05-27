@@ -25,6 +25,7 @@ var validateString60 = validateStringLength(60);
 var validateString40 = validateStringLength(40);
 var validateString20 = validateStringLength(20);
 var validateString10 = validateStringLength(10);
+var validateString0 = validateStringLength(0);
 
 // var validateString60 = function(property) {
 //     return ((this.provider !== 'local' && !this.updated) || property.length <= 60);
@@ -90,11 +91,18 @@ var UserSchema = new Schema({
         validate: [validateString60, 'Please fill in your email'],
         match: [/.+\@.+\..+/, 'Please fill a valid email address']
     },
+    email2: {
+        type: String,
+        trim: true,
+        default: '',
+        // Spurious error message for bots filling in this hidden field
+        validate: [validateString0, 'Please fill in your second email'],
+    },
     username: {
         type: String,
         unique: true,
+        validate: [validateString20, 'Please fill in a username'],
         required: 'Please fill in a username',
-        match: [/.+\@.+\..+/, 'Please fill in a username'],
         trim: true
     },
     password: {

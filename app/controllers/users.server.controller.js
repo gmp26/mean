@@ -61,14 +61,6 @@ exports.signup = function(req, res) {
         user.schoolpostCode = s.postCode;
     }
 
-    if (user.username === '') {
-        // Use email as username
-        user.username = user.email;
-    } else {
-        // If the username is filled in the user is a bot
-        user.username = 'bot';
-    }
-
     // Then save the user 
     user.save(function(err) {
         if (err) {
