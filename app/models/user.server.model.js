@@ -16,8 +16,8 @@ var validateLocalStrategyProperty = function(property) {
 
 var validateStringLength = function(limit) {
     return function(property) {
-        ((this.provider !== 'local' && !this.updated) || property.length <= limit);
-    }
+        return ((this.provider !== 'local' && !this.updated) || property.length <= limit);
+    };
 };
 
 var validateString80 = validateStringLength(80);
@@ -54,8 +54,6 @@ var validateAffiliated = function(checked) {
 };
 
 var validateTitle = function(title) {
-    console.log("title=" + title);
-    console.log("isValid = " + ['MrMrsMsMissDr'].indexOf(title));
     return (this.provider !== 'local' || 'MrMrsMsMissDr'.indexOf(title) >= 0);
 };
 
