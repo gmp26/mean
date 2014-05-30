@@ -64,9 +64,7 @@ exports.signup = function(req, res) {
     // Then save the user 
     user.save(function(err) {
         if (err) {
-            return res.send(400, {
-                message: getErrorMessage(err)
-            });
+            return res.send(400, getErrorMessage(err));
         } else {
             // Remove sensitive data before login
             user.password = undefined;
