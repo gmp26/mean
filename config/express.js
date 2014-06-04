@@ -24,6 +24,9 @@ module.exports = function(db) {
     // Initialize express app
     var app = express();
 
+    // We are behind a proxy
+    app.enable('trust proxy');
+
     // Globbing model files
     config.getGlobbedFiles('./app/models/**/*.js').forEach(function(modelPath) {
         require(path.resolve(modelPath));

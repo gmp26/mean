@@ -96,7 +96,10 @@ exports.delete = function(req, res) {
  * List of Comments
  */
 exports.list = function(req, res) {
-    Comment.find().sort('-created').populate('user', 'displayName').exec(function(err, comments) {
+    var spotId = req.spotId;
+    Comment.find({
+        spotId: spotId
+    }).sort('-created').populate('user', 'displayName').exec(function(err, comments) {
         if (err) {
             return res.send(400, {
                 message: getErrorMessage(err)

@@ -8,7 +8,8 @@ var users = require('../../app/controllers/users'),
 
 module.exports = function(app) {
     // Comment Routes
-    app.route('/comments')
+    // app.route('/comments')
+    app.route('/spot/:spotId')
         .get(comments.list)
         .post(users.requiresLogin, comments.create);
 
@@ -17,6 +18,11 @@ module.exports = function(app) {
         .put(users.requiresLogin, comments.hasAuthorization, comments.update)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
 
-    // Finish by binding the comment middleware
+    // Finish by binding the parameter comment middleware
+    app.param('spotId', function(req, res, next, spotId) {
+        req.spotId = spotId;
+        next();
+    });
+
     app.param('commentId', comments.commentByID);
 };
