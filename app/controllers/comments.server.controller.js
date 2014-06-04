@@ -7,7 +7,9 @@ var mongoose = require('mongoose'),
     _ = require('lodash');
 
 var debug = require('debug')('comments');
+var util = require('util');
 
+debug('server controller');
 /**
  * Get the error message from error object
  */
@@ -36,8 +38,14 @@ var getErrorMessage = function(err) {
  * Create a comment
  */
 exports.create = function(req, res) {
-    var comment = new Comment(req.body);
-    comment.user = req.user;
+
+    debug('user = ' + req.user);
+    debug(util.inspect(req));
+
+    var comment = new Comment();
+    comment.title = 'dummy title';
+    comment.content = 'dummy content';
+    comment.user = req.user._id;
 
     comment.save(function(err) {
         if (err) {
