@@ -1,11 +1,12 @@
 'use strict';
-
 /**
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
     Comment = mongoose.model('Comment'),
     _ = require('lodash');
+
+var debug = require('debug')('comments');
 
 /**
  * Get the error message from error object
@@ -97,6 +98,7 @@ exports.delete = function(req, res) {
  */
 exports.list = function(req, res) {
     var spotId = req.spotId;
+    debug('spotId = ' + spotId);
     Comment.find({
         spotId: spotId
     }).sort('-created').populate('user', 'displayName').exec(function(err, comments) {
@@ -105,6 +107,7 @@ exports.list = function(req, res) {
                 message: getErrorMessage(err)
             });
         } else {
+            debug('comments.list ok');
             res.jsonp(comments);
         }
     });
