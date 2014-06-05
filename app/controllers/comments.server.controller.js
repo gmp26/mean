@@ -111,7 +111,7 @@ exports.list = function(req, res) {
     debug('spotId = ' + spotId);
     Comment.find({
         spotId: spotId
-    }).sort('-created').populate('user', 'displayName').exec(function(err, comments) {
+    }).sort('-created').populate('user', 'email displayName').exec(function(err, comments) {
         if (err) {
             return res.send(400, {
                 message: getErrorMessage(err)
@@ -127,7 +127,7 @@ exports.list = function(req, res) {
  * Comment middleware
  */
 exports.commentByID = function(req, res, next, id) {
-    Comment.findById(id).populate('user', 'displayName').exec(function(err, comment) {
+    Comment.findById(id).populate('user', 'email displayName').exec(function(err, comment) {
         if (err) return next(err);
         if (!comment) return next(new Error('Failed to load comment ' + id));
         req.comment = comment;
