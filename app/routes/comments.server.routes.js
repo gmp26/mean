@@ -12,10 +12,10 @@ module.exports = function(app) {
     app.route('/comments/:spotId')
         .get(comments.list);
 
-    app.route('/comment/:spotId/id')
+    app.route('/comment/id')
         .post(users.requiresLogin, comments.create);
 
-    app.route('/comment/:spotId/id/:commentId')
+    app.route('/comment/id/:commentId')
         .get(comments.read)
         .put(users.requiresLogin, comments.hasAuthorization, comments.update)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
@@ -26,6 +26,5 @@ module.exports = function(app) {
         req.spotId = spotId;
         next();
     });
-
     app.param('commentId', comments.commentByID);
 };

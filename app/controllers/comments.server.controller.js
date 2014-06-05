@@ -40,11 +40,11 @@ var getErrorMessage = function(err) {
 exports.create = function(req, res) {
 
     debug('user = ' + req.user);
-    debug(util.inspect(req));
+    debug(util.inspect(req.body));
 
     var comment = new Comment();
 
-    comment.spotId = req.params.spotId;
+    comment.spotId = req.body.spotId;
     comment.user = req.user._id;
     comment.title = req.body.title;
     comment.content = req.body.content;
