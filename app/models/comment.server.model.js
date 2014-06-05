@@ -10,6 +10,15 @@ var mongoose = require('mongoose'),
  * Comment Schema
  */
 var CommentSchema = new Schema({
+    spotId: {
+        type: String,
+        default: '',
+        required: 'SpotId cannot be empty'
+    },
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User'
+    },
     created: {
         type: Date,
         default: Date.now
@@ -18,16 +27,12 @@ var CommentSchema = new Schema({
         type: String,
         default: '',
         trim: true,
-        required: 'Title cannot be blank'
+        required: 'Title cannot be empty'
     },
     content: {
         type: String,
         default: '',
         trim: true
-    },
-    user: {
-        type: Schema.ObjectId,
-        ref: 'User'
     }
 });
 

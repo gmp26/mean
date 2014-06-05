@@ -43,9 +43,11 @@ exports.create = function(req, res) {
     debug(util.inspect(req));
 
     var comment = new Comment();
-    comment.title = 'dummy title';
-    comment.content = 'dummy content';
+
+    comment.spotId = req.params.spotId;
     comment.user = req.user._id;
+    comment.title = req.body.title;
+    comment.content = req.body.content;
 
     comment.save(function(err) {
         if (err) {
@@ -85,7 +87,7 @@ exports.update = function(req, res) {
 };
 
 /**
- * Delete an comment
+ * Delete a comment
  */
 exports.delete = function(req, res) {
     var comment = req.comment;
