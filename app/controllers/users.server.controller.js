@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
     passport = require('passport'),
     User = mongoose.model('User'),
     _ = require('lodash'),
-    util = require('util');
+    util = require('util'),
+    debug = require('debug')('users');
 
 
 /**
@@ -104,6 +105,44 @@ exports.signin = function(req, res, next) {
         }
     })(req, res, next);
 };
+
+
+/**
+ * Comment middleware
+ */
+exports.findOne = function(req, res) {
+    debug('findOne');
+    debug(util.inspect(req));
+
+    var email = req.query.email;
+    if (email) {
+        User.findOne({
+            email: email
+        }).exec(function(err, user) {
+            if (err) {
+                debug(err);
+                res.send(400, {
+                    message: 'Users.findOne lookup fails ' + email
+                });
+            }
+            if (!user) {
+                debug('email not found ' + email);
+                res.send(400, {
+                    message: 'email not found ' + email
+                });
+            } else {
+                res.json({
+                    username: user.username
+                });
+            }
+        });
+    } else {
+        res.send(400, {
+            message: 'User is not signed in'
+        });
+    }
+};
+
 
 /**
  * Update user details
