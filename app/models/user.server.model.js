@@ -5,7 +5,9 @@
  */
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    debug = require('debug')('userModel'),
+    validator = require('validator');
 
 /**
  * A Validation function for local strategy properties
@@ -16,7 +18,10 @@ var validateLocalStrategyProperty = function(property) {
 
 var validateStringLength = function(limit) {
     return function(property) {
-        return ((this.provider !== 'local' && !this.updated) || property.length <= limit);
+
+        return (this.provider !== 'local' && !this.updated) ||
+            (property.length <= limit && property === validator.escape(property) &&
+            property === validator.stripLow(property, true));
     };
 };
 
@@ -26,22 +31,6 @@ var validateString40 = validateStringLength(40);
 var validateString20 = validateStringLength(20);
 var validateString10 = validateStringLength(10);
 var validateString0 = validateStringLength(0);
-
-// var validateString60 = function(property) {
-//     return ((this.provider !== 'local' && !this.updated) || property.length <= 60);
-// };
-
-// var validateString40 = function(property) {
-//     return ((this.provider !== 'local' && !this.updated) || property.length <= 40);
-// };
-
-// var validateString20 = function(property) {
-//     return ((this.provider !== 'local' && !this.updated) || property.length <= 20);
-// };
-
-// var validateString10 = function(property) {
-//     return ((this.provider !== 'local' && !this.updated) || property.length <= 10);
-// };
 
 /**
  * A Validation function for local strategy password
@@ -55,7 +44,8 @@ var validateAffiliated = function(checked) {
 };
 
 var validateTitle = function(title) {
-    return (this.provider !== 'local' || 'MrMrsMsMissDr'.indexOf(title) >= 0);
+    var whiteList = ['Mr', 'Mrs', 'Ms', 'Miss', 'Dr'];
+    return (this.provider !== 'local' || whiteList.indexOf(title) >= 0);
 };
 
 /**
@@ -82,14 +72,15 @@ var UserSchema = new Schema({
     },
     displayName: {
         type: String,
-        trim: true
+        trim: true,
+        validate: [validateString80, 'invalid displayName']
     },
     email: {
         type: String,
         trim: true,
         default: '',
         validate: [validateString60, 'Please fill in your email'],
-        match: [/.+\@.+\..+/, 'Please fill a valid email address']
+        match: [/.+\@.+\..+/, 'Please provide a valid email address']
     },
     email2: {
         type: String,
@@ -192,6 +183,23 @@ UserSchema.pre('save', function(next) {
 
     next();
 });
+
+/* to be added to above
+mySchema.pre("save",function(next, done) {
+    var self = this;
+    mongoose.models["User"].findOne({email : self.email},function(err, results) {
+        if(err) {
+            done(err);
+        } else if(results) { //there was a result found, so the email address exists
+            self.invalidate("email","email must be unique");
+            done(new Error("email must be unique"));
+        } else {
+            done();
+        }
+    });
+    next();
+});
+*/
 
 /**
  * Create instance method for hashing a password

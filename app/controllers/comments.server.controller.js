@@ -48,6 +48,7 @@ exports.create = function(req, res) {
     comment.user = req.user._id;
     comment.title = req.body.title;
     comment.content = req.body.content;
+    comment.votes = [];
 
     comment.save(function(err) {
         if (err) {
