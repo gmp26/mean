@@ -122,13 +122,13 @@ exports.findOne = function(req, res) {
             if (err) {
                 debug(err);
                 res.send(400, {
-                    message: 'Users.findOne lookup fails ' + email
+                    message: 'Lookup failure on ' + email
                 });
             }
             if (!user) {
                 debug('email not found ' + email);
                 res.send(400, {
-                    message: 'email not found ' + email
+                    message: 'Unknown email ' + email
                 });
             } else {
                 res.json({

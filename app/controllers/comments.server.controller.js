@@ -124,21 +124,6 @@ exports.list = function(req, res) {
 };
 
 /**
- * Upvote a comment
- */
-exports.upvote = function(req, res) {
-    var comment = req.comment;
-
-    // upvote and save, responding with total votes
-    comment.upvote(req.user, function() {
-        res.json({
-            votes: comment.upvotes()
-        });
-    });
-};
-
-
-/**
  * Comment middleware
  */
 exports.commentByID = function(req, res, next, id) {
@@ -149,6 +134,37 @@ exports.commentByID = function(req, res, next, id) {
         req.comment = comment;
         next();
     });
+};
+
+/**
+ * Upvote a comment
+ */
+exports.upvote = function(req, res) {
+    debug("req.id = " + req.body.commentId);
+    if (req.body && req.body.commentId) {
+        var id = req.body.commentId;
+        Comment.findById(id).exec(function(err, comment) {
+            if (err) {
+                return res.send(404, {
+                    message: 'Invalid comment ' + id
+                });
+            }
+            if (!comment) {
+                return res.send(404, {
+                    message: 'Failed to load comment ' + id
+                });
+            }
+
+            // upvote and save, responding with total votes
+            comment.upvote(req.user, function() {
+                res.json({
+                    votes: comment.upvotes()
+                });
+            });
+
+            // Should anything happen here?
+        });
+    }
 };
 
 /**
