@@ -15,6 +15,9 @@ module.exports = function(app) {
     app.route('/comment/id')
         .post(users.requiresLogin, comments.create);
 
+    app.route('/comment/vote/id/:commentId')
+        .get(users.requiresLogin, comments.upvote);
+
     app.route('/comment/id/:commentId')
         .get(comments.read)
         .put(users.requiresLogin, comments.hasAuthorization, comments.update)
@@ -26,5 +29,6 @@ module.exports = function(app) {
         req.spotId = spotId;
         next();
     });
+
     app.param('commentId', comments.commentByID);
 };

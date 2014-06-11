@@ -108,7 +108,7 @@ exports.signin = function(req, res, next) {
 
 
 /**
- * Comment middleware
+ * Find user by email
  */
 exports.findOne = function(req, res) {
     debug('findOne');

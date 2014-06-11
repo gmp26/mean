@@ -6,6 +6,7 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     validator = require('validator'),
+    voting = require('mongoose-voting'),
     _ = require('lodash');
 
 /**
@@ -31,16 +32,18 @@ var CommentSchema = new Schema({
         trim: true,
         required: 'Title cannot be empty'
     },
-    votes: [{
-        type: Schema.ObjectId,
-        ref: 'User'
-    }],
+    // votes: [{
+    //     type: Schema.ObjectId,
+    //     ref: 'User'
+    // }],
     content: {
         type: String,
         default: '',
         trim: true
     }
 });
+
+CommentSchema.plugin(voting);
 
 
 /**
@@ -59,7 +62,7 @@ CommentSchema.pre('save', function(next) {
     }
 
     // Only one vote saved per user
-    this.votes = _.uniq(this.votes);
+    // this.votes = _.uniq(this.votes);
 
     next();
 });

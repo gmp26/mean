@@ -48,7 +48,6 @@ exports.create = function(req, res) {
     comment.user = req.user._id;
     comment.title = req.body.title;
     comment.content = req.body.content;
-    comment.votes = [];
 
     comment.save(function(err) {
         if (err) {
@@ -125,9 +124,25 @@ exports.list = function(req, res) {
 };
 
 /**
+ * Upvote a comment
+ */
+exports.upvote = function(req, res) {
+    var comment = req.comment;
+
+    // upvote and save, responding with total votes
+    comment.upvote(req.user, function() {
+        res.json({
+            votes: comment.upvotes()
+        });
+    });
+};
+
+
+/**
  * Comment middleware
  */
 exports.commentByID = function(req, res, next, id) {
+    debug('findById comment ' + id);
     Comment.findById(id).populate('user', 'email displayName').exec(function(err, comment) {
         if (err) return next(err);
         if (!comment) return next(new Error('Failed to load comment ' + id));
