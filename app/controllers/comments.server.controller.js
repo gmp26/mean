@@ -140,7 +140,7 @@ exports.commentByID = function(req, res, next, id) {
  * Upvote a comment
  */
 exports.upvote = function(req, res) {
-    debug("req.id = " + req.body.commentId);
+    debug('req.id = ' + req.body.commentId);
     if (req.body && req.body.commentId) {
         var id = req.body.commentId;
         Comment.findById(id).exec(function(err, comment) {

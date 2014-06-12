@@ -16,8 +16,7 @@ module.exports = function(app) {
         .post(users.requiresLogin, comments.create);
 
     app.route('/comment/vote/id')
-        .post(users.requiresLogin, comments.upvote)
-    // .get(users.requiresLogin, comments.upvote);
+        .post(users.requiresLogin, comments.upvote);
 
     app.route('/comment/id/:commentId')
         .get(comments.read)
