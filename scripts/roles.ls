@@ -17,5 +17,17 @@ MongoClient.connect 'mongodb://localhost:27017/foo-dev', (err, db) ->
       user: 'Mike'
       role: 'admin'
 
-    collection.insert doc
-    console.log 'Mike written'
+    collection.insert doc, {w:1}, (err, result) ->
+      if err
+        console.log "error on write"
+        console.dir err
+        return
+
+      console.log "result"
+      console.dir result
+
+    console.log 'end'
+
+  console.log 'the real end'
+
+console.log 'the real real end'
