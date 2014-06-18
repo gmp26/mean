@@ -1,6 +1,6 @@
 'use strict';
 
-/**
+/**x
  * Module dependencies.
  */
 var express = require('express'),
@@ -18,7 +18,10 @@ var express = require('express'),
     flash = require('connect-flash'),
     config = require('./config'),
     consolidate = require('consolidate'),
+    debug = require('debug')('express'),
+    util = require('util'),
     path = require('path');
+
 
 module.exports = function(db) {
     // Initialize express app
@@ -133,6 +136,10 @@ module.exports = function(db) {
 
     // Assume 404 since no middleware responded
     app.use(function(req, res) {
+
+        debug('req = ');
+        debug(util.inspect(req));
+
         res.status(404).render('404', {
             url: req.originalUrl,
             error: 'Not Found'

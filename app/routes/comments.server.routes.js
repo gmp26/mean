@@ -12,16 +12,17 @@ module.exports = function(app) {
     app.route('/comments/:spotId')
         .get(comments.list);
 
+    app.route('/comment/id/:commentId')
+        .put(users.requiresLogin, comments.hasAuthorization, comments.update)
+        .get(comments.read)
+        .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
+
     app.route('/comment/id')
         .post(users.requiresLogin, comments.create);
 
     app.route('/comment/vote/id')
         .post(users.requiresLogin, comments.upvote);
 
-    app.route('/comment/id/:commentId')
-        .get(comments.read)
-        .put(users.requiresLogin, comments.hasAuthorization, comments.update)
-        .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
 
 
     // Finish by binding the parameter comment middleware
