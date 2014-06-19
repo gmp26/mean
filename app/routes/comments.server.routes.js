@@ -23,7 +23,6 @@ module.exports = function(app) {
         .put(users.requiresLogin, comments.hasAuthorization, comments.update)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
 
-
     // Finish by binding the parameter comment middleware
     app.param('spotId', function(req, res, next, spotId) {
         req.spotId = spotId;

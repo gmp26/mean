@@ -39,9 +39,6 @@ var getErrorMessage = function(err) {
  */
 exports.create = function(req, res) {
 
-    debug('user = ' + req.user);
-    debug(util.inspect(req.body));
-
     var comment = new Comment();
 
     comment.spotId = req.body.spotId;
@@ -73,7 +70,11 @@ exports.read = function(req, res) {
 exports.update = function(req, res) {
     var comment = req.comment;
 
-    comment = _.extend(comment, req.body);
+    comment.content = req.query.content;
+    comment.title = req.query.title;
+
+    debug('comment:');
+    debug(util.inspect(comment));
 
     comment.save(function(err) {
         if (err) {
