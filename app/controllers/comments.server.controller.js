@@ -10,6 +10,7 @@ var debug = require('debug')('comments');
 var util = require('util');
 
 debug('server controller');
+
 /**
  * Get the error message from error object
  */
@@ -74,6 +75,31 @@ exports.update = function(req, res) {
     comment.title = req.query.title;
 
     debug('comment:');
+    debug(util.inspect(comment));
+
+    comment.save(function(err) {
+        if (err) {
+            return res.send(400, {
+                message: getErrorMessage(err)
+            });
+        } else {
+            res.jsonp(comment);
+        }
+    });
+};
+
+/**
+ * Append a reply to a comment
+ */
+exports.appendReply = function(req, res) {
+    var comment = req.comment;
+
+    if (!comment.replies) {
+        comment.replies = []
+    }
+    comment.replies.push(req.query.reply);
+
+    debug('appendReply: ' + req.query.reply);
     debug(util.inspect(comment));
 
     comment.save(function(err) {
@@ -174,10 +200,11 @@ exports.upvote = function(req, res) {
  * Comment authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-    if (req.comment.user.id !== req.user.id) {
+    if (req.comment.user.id == req.user.id || _.contains(req.user.roles, 'admin')) {
+        next();
+    } else {
         return res.send(403, {
             message: 'User is not authorized'
         });
     }
-    next();
 };

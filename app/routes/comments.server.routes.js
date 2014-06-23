@@ -13,6 +13,7 @@ module.exports = function(app) {
         .get(comments.list);
 
     app.route('/comment/id/:commentId')
+        .post(users.requiresLogin, comments.appendReply)
         .put(users.requiresLogin, comments.hasAuthorization, comments.update)
         .get(comments.read)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
