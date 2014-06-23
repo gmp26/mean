@@ -37,10 +37,7 @@ var CommentSchema = new Schema({
         type: String,
         default: '',
         trim: true
-    },
-    replies: [{
-        content: String
-    }]
+    }
 });
 
 CommentSchema.plugin(voting);
