@@ -196,13 +196,20 @@ exports.upvote = function(req, res) {
     }
 };
 
+function ageInMinutes(comment) {
+    return (Date.now() - comment.created.getTime()) / 60000;
+}
+
 /**
  * Comment authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-
-    debug((Date.now() - req.comment.created.getTime()) < 3600000);
-    if (req.comment.user.id === req.user.id || _.contains(req.user.roles, 'admin')) {
+    // authorise edits for admin users, and creators for 10 minutes if there are no replies
+    if (
+        req.comment.user.id === req.user.id &&
+        ageInMinutes(req.comment) > 10 &&
+        (!req.comment.replies || !req.comment.replies.length) || _.contains(req.user.roles, 'admin')
+    ) {
         next();
     } else {
         return res.send(403, {
