@@ -74,8 +74,8 @@ exports.update = function(req, res) {
     comment.content = req.query.content;
     comment.title = req.query.title;
 
-    debug('comment:');
-    debug(util.inspect(comment));
+    // debug('comment:');
+    // debug(util.inspect(comment));
 
     comment.save(function(err) {
         if (err) {
@@ -95,12 +95,12 @@ exports.appendReply = function(req, res) {
     var comment = req.comment;
 
     if (!comment.replies) {
-        comment.replies = []
+        comment.replies = [];
     }
     comment.replies.push(req.query.reply);
 
-    debug('appendReply: ' + req.query.reply);
-    debug(util.inspect(comment));
+    // debug('appendReply: ' + req.query.reply);
+    // debug(util.inspect(comment));
 
     comment.save(function(err) {
         if (err) {
@@ -135,7 +135,7 @@ exports.delete = function(req, res) {
  */
 exports.list = function(req, res) {
     var spotId = req.spotId;
-    debug('spotId = ' + spotId);
+    // debug('spotId = ' + spotId);
     Comment.find({
         spotId: spotId
     }).sort('-created')
@@ -200,7 +200,9 @@ exports.upvote = function(req, res) {
  * Comment authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-    if (req.comment.user.id == req.user.id || _.contains(req.user.roles, 'admin')) {
+
+    debug((Date.now() - req.comment.created.getTime()) < 3600000);
+    if (req.comment.user.id === req.user.id || _.contains(req.user.roles, 'admin')) {
         next();
     } else {
         return res.send(403, {
