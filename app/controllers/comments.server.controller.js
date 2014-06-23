@@ -112,16 +112,18 @@ exports.list = function(req, res) {
     debug('spotId = ' + spotId);
     Comment.find({
         spotId: spotId
-    }).sort('-created').populate('user', 'email displayName').exec(function(err, comments) {
-        if (err) {
-            return res.send(400, {
-                message: getErrorMessage(err)
-            });
-        } else {
-            debug('comments.list ok');
-            res.jsonp(comments);
-        }
-    });
+    }).sort('-created')
+        .populate('user', 'email displayName')
+        .exec(function(err, comments) {
+            if (err) {
+                return res.send(400, {
+                    message: getErrorMessage(err)
+                });
+            } else {
+                debug('comments.list ok');
+                res.jsonp(comments);
+            }
+        });
 };
 
 /**
