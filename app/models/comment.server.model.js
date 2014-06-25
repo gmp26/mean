@@ -17,11 +17,13 @@ var CommentSchema = new Schema({
     spotId: {
         type: String,
         default: '',
-        required: 'SpotId cannot be empty'
+        required: 'SpotId cannot be empty',
+        index: true
     },
     user: {
         type: Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        index: true
     },
     created: {
         type: Date,

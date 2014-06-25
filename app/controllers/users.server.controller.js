@@ -87,6 +87,7 @@ exports.signup = function(req, res) {
  */
 exports.signin = function(req, res, next) {
     console.log('signin request');
+    console.log('req: ' + util.inspect(req));
     passport.authenticate('local', function(err, user, info) {
         if (err || !user) {
             res.send(400, info);
@@ -108,13 +109,17 @@ exports.signin = function(req, res, next) {
 
 
 /**
- * Find user by email
+ * Find user by email or username
  */
 exports.findOne = function(req, res) {
     debug('findOne');
-    debug(util.inspect(req));
+    // debug(util.inspect(req));
+    debug('username = ' + req.query.username);
+    debug('email = ' + req.query.email);
 
     var email = req.query.email;
+    var username = req.query.username;
+
     if (email) {
         User.findOne({
             email: email
@@ -124,23 +129,29 @@ exports.findOne = function(req, res) {
                 res.send(400, {
                     message: 'Lookup failure on ' + email
                 });
-            }
-            if (!user) {
-                debug('email not found ' + email);
+            } else res.json({
+                user: user
+            });
+        });
+    } else if (username) {
+        User.findOne({
+            username: username
+        }).exec(function(err, user) {
+            if (err) {
+                debug(err);
                 res.send(400, {
-                    message: 'Unknown email ' + email
+                    message: 'Lookup failure on ' + username
                 });
-            } else {
-                res.json({
-                    username: user.username
-                });
-            }
+            } else res.json({
+                user: user
+            });
         });
     } else {
         res.send(400, {
-            message: 'User is not signed in'
+            message: 'empty query'
         });
     }
+
 };
 
 
