@@ -206,12 +206,12 @@ function ageInMinutes(comment) {
 exports.hasAuthorization = function(req, res, next) {
     // authorise edits for admin users, and creators for 10 minutes if there are no replies
     var ok = req.comment.user.id === req.user.id;
-    ok = ok || ageInMinutes(req.comment) <= 10;
-    ok = ok || !req.comment.replies || !req.comment.replies.length;
+    ok = ok && ageInMinutes(req.comment) <= 10;
+    ok = ok && !req.comment.replies || !req.comment.replies.length;
     ok = ok || _.contains(req.user.roles, 'admin');
     // debug(ok);
-    // debug(ok = ok || ageInMinutes(req.comment) <= 10);
-    // debug(ok = ok || !req.comment.replies || !req.comment.replies.length);
+    // debug(ok = ok && ageInMinutes(req.comment) <= 10);
+    // debug(ok = ok && !req.comment.replies || !req.comment.replies.length);
     // debug(ok = ok || _.contains(req.user.roles, 'admin'));
 
     if (ok) {
