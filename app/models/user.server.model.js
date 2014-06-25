@@ -77,6 +77,9 @@ var UserSchema = new Schema({
     },
     email: {
         type: String,
+        index: {
+            unique: true,
+        },
         trim: true,
         default: '',
         validate: [validateString60, 'Please fill in your email'],
@@ -91,7 +94,9 @@ var UserSchema = new Schema({
     },
     username: {
         type: String,
-        unique: true,
+        index: {
+            unique: true
+        },
         validate: [validateString20, 'Please fill in a username'],
         required: 'Please fill in a username',
         trim: true
