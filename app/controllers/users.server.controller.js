@@ -5,6 +5,7 @@
  */
 var mongoose = require('mongoose'),
     passport = require('passport'),
+    nodemailer = require('nodemailer'),
     User = mongoose.model('User'),
     _ = require('lodash'),
     util = require('util'),
@@ -210,31 +211,27 @@ function clearOneTime(email) {
 
 // This is an example that works on the server:
 
-var nodemailer = require('nodemailer');
 var smtpTransport = nodemailer.createTransport('SMTP', {
     host: 'smtp.hermes.cam.ac.uk',
     port: 587,
     debug: true,
     auth: {
-        user: 'gmp26',
-        pass: 'notmypassword'
+        user: process.env.crsid,
+        pass: process.env.hermesPassword
     }
 });
 
 var mailOptions = {
     from: '<gmp26@cam.ac.uk>', // sender address
     to: 'gmp26@cam.ac.uk', // list of receivers
-    subject: 'CMEP Password Reset Request', // Subject line
-    text: 'We received a password reset request for your CMEP account.\\n\\n' +
-        'A new password has been generated for you which is good for one sign-in only.\\n' +
-        'Your one-time password is\\n\\n' +
-        'password\\n\\n' +
-        'Please sign in with this password.\\n' +
-        'You will be directed to your settings page where you can choose a new password',
-    html: '<b>Hello world </b>' // html body
+    subject: 'CMEP Password Reset Request (testing)', // Subject line
+    html: '<p>We received a password reset request for your CMEP account.</p>' +
+        '<p>A new password has been generated for you which is good for one sign-in only. ' +
+        'Your one-time password is</p>' +
+        '<div style="font-weight:bold;font-size:1.8em">password</div>' +
+        '<p>Please sign in with this password. ' +
+        'You will then be redirected to your settings page where you can choose a new password</p>'
 };
-
-
 
 /**
  * Reset Password
@@ -283,8 +280,9 @@ exports.resetPassword = function(req, res) {
         });
     }
 
-
-    return res.send(400, 'email received');
+    return res.json(200, {
+        message: 'email sent'
+    });
 };
 
 /**
