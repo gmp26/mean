@@ -20,6 +20,9 @@ module.exports = function(app) {
     app.route('/auth/signin').post(users.signin);
     app.route('/auth/signout').get(users.signout);
 
+    // Recovering a lost password
+    app.route('/auth/resetPassword').post(users.resetPassword);
+
     // Setting the facebook oauth routes
     app.route('/auth/facebook').get(passport.authenticate('facebook', {
         scope: ['email']

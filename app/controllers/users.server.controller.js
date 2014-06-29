@@ -86,10 +86,13 @@ exports.signup = function(req, res) {
  * Signin after passport authentication
  */
 exports.signin = function(req, res, next) {
-    console.log('signin request');
-    console.log('req: ' + util.inspect(req));
+    debug('signin request');
     passport.authenticate('local', function(err, user, info) {
-        if (err || !user) {
+        if (err) {
+            debug('signin err = ' + err);
+            res.send(400, err);
+        } else if (!user) {
+            debug('no user ' + info.message);
             res.send(400, info);
         } else {
             // Remove sensitive data before login
@@ -98,6 +101,8 @@ exports.signin = function(req, res, next) {
 
             req.login(user, function(err) {
                 if (err) {
+                    debug('signin 400 failure');
+                    debug(util.inspect(err));
                     res.send(400, err);
                 } else {
                     res.jsonp(user);
@@ -112,10 +117,10 @@ exports.signin = function(req, res, next) {
  * Find user by email or username
  */
 exports.findOne = function(req, res) {
-    debug('findOne');
+    //debug('findOne');
     // debug(util.inspect(req));
-    debug('username = ' + req.query.username);
-    debug('email = ' + req.query.email);
+    //debug('username = ' + req.query.username);
+    //debug('email = ' + req.query.email);
 
     var email = req.query.email;
     var username = req.query.username;
@@ -193,6 +198,93 @@ exports.update = function(req, res) {
             message: 'User is not signed in'
         });
     }
+};
+
+
+var oneTimes = {};
+
+function clearOneTime(email) {
+    debug('deleting one time password ' + email);
+    delete oneTimes[email];
+}
+
+// This is an example that works on the server:
+
+var nodemailer = require('nodemailer');
+var smtpTransport = nodemailer.createTransport('SMTP', {
+    host: 'smtp.hermes.cam.ac.uk',
+    port: 587,
+    debug: true,
+    auth: {
+        user: 'gmp26',
+        pass: 'notmypassword'
+    }
+});
+
+var mailOptions = {
+    from: '<gmp26@cam.ac.uk>', // sender address
+    to: 'gmp26@cam.ac.uk', // list of receivers
+    subject: 'CMEP Password Reset Request', // Subject line
+    text: 'We received a password reset request for your CMEP account.\\n\\n' +
+        'A new password has been generated for you which is good for one sign-in only.\\n' +
+        'Your one-time password is\\n\\n' +
+        'password\\n\\n' +
+        'Please sign in with this password.\\n' +
+        'You will be directed to your settings page where you can choose a new password',
+    html: '<b>Hello world </b>' // html body
+};
+
+
+
+/**
+ * Reset Password
+ */
+exports.resetPassword = function(req, res) {
+    debug('body email = ' + req.body.resetEmail);
+    var resetEmail = req.body.resetEmail;
+    if (resetEmail) {
+        User.findOne({
+            email: resetEmail
+        }).exec(function(err, user) {
+            if (err) {
+                debug(err);
+                res.send(400, {
+                    message: 'Lookup failure on ' + resetEmail
+                });
+            } else {
+                // generate one-time password
+                var oneTime = 'password';
+
+                // start timeout on password
+                var timeout = setTimeout(clearOneTime, 1000 * 3600, resetEmail);
+
+                // store one-time password along with timeoutObject
+                oneTimes[resetEmail] = [oneTime, timeout];
+
+                // email user with password
+                // send mail with defined transport object
+                smtpTransport.sendMail(mailOptions, function(err, response) {
+                    if (err) {
+                        console.log(err);
+                        res.send(400, {
+                            message: 'unable to send email'
+                        });
+                    } else {
+                        console.log('Message sent: ' + response.message);
+                        // simple success displays instructions to user
+                        res.send(200);
+                    }
+                    // if you don't want to use this transport object anymore, uncomment following line
+                    //smtpTransport.close(); // shut down the connection pool, no more messages
+                });
+
+
+            }
+        });
+    }
+
+
+    return res.send(400, 'email received');
 };
 
 /**
