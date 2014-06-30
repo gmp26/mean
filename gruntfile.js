@@ -76,7 +76,7 @@ module.exports = function(grunt) {
             dev: {
                 script: 'server.js',
                 options: {
-                    nodeArgs: ['--debug-brk'],
+                    // nodeArgs: ['--debug-brk'],
                     watch: ['app', 'config', 'server.js']
                 }
             }
