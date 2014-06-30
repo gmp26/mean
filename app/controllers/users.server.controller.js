@@ -128,8 +128,20 @@ exports.signin = function(req, res, next) {
                         // We need to set the session cookie so user
                         // can be redirected to settings page.
 
-                        res.json(200, {
-                            user: user
+                        // Remove sensitive data before login
+                        user.password = undefined;
+                        user.salt = undefined;
+
+                        req.login(user, function(err) {
+                            if (err) {
+                                debug('signin 400 failure');
+                                debug(util.inspect(err));
+                                res.send(400, err);
+                            } else {
+                                res.jsonp(200, {
+                                    user: user
+                                });
+                            }
                         });
                     }
                 });
