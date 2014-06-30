@@ -18,7 +18,7 @@ function clearOneTime(email) {
     debug('deleting one time password ' + email);
 
     // cancel the timeout
-    oneTimes[email][0]();
+    clearTimeout(oneTimes[email][1]);
 
     // delete the record from the oneTimes object
     delete oneTimes[email];
@@ -108,14 +108,14 @@ exports.signin = function(req, res, next) {
         var password = req.body.password;
         if (oneTimes) {
             var ot = oneTimes[email];
-            if (ot && ot[1] === password) {
+            if (ot && ot[0] === password) {
 
                 // clear the oneTime password timeout
-                ot[0]();
+                clearTimeout(ot[1]);
                 delete oneTimes[email];
 
                 // fetch user details
-                User.findOne({
+                return User.findOne({
                     email: email
                 }).exec(function(err, user) {
                     if (err) {
@@ -294,7 +294,7 @@ exports.resetPassword = function(req, res) {
                 });
             } else {
                 // generate one-time password
-                var oneTime = 'password ';
+                var oneTime = 'password';
 
                 // start timeout on password
                 var timeout = setTimeout(clearOneTime, 1000 * 3600, resetEmail);
