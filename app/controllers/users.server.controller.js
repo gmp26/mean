@@ -107,6 +107,7 @@ exports.signin = function(req, res, next) {
         var email = req.body.email;
         var password = req.body.password;
         if (oneTimes) {
+            debugger;
             var ot = oneTimes[email];
             if (ot && ot[0] === password) {
 
@@ -309,6 +310,8 @@ exports.resetPassword = function(req, res) {
 
                 // store one-time password along with timeoutObject
                 oneTimes[resetEmail] = [oneTime, timeout];
+
+                debug("oneTimes[" + resetEmail + "]=" + oneTime);
 
                 // email user with password
                 // send mail with defined transport object
