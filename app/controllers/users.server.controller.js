@@ -15,13 +15,17 @@ var mongoose = require('mongoose'),
 var oneTimes = {};
 
 function clearOneTime(email) {
+    var ot, tobj;
+
     debug('deleting one time password ' + email);
 
     // cancel the timeout
-    clearTimeout(oneTimes[email][1]);
+    if ((ot = oneTimes[email]) && (tobj = ot[1])) {
+        clearTimeout(tobj);
 
-    // delete the record from the oneTimes object
-    delete oneTimes[email];
+        // delete the record from the oneTimes object
+        delete oneTimes[email];
+    }
 }
 
 /**
@@ -311,8 +315,6 @@ exports.resetPassword = function(req, res) {
                 // store one-time password along with timeoutObject
                 oneTimes[resetEmail] = [oneTime, timeout];
 
-                debug("oneTimes[" + resetEmail + "]=" + oneTime);
-
                 // email user with password
                 // send mail with defined transport object
                 smtpTransport.sendMail(mailOptions, function(err, response) {
@@ -336,6 +338,55 @@ exports.resetPassword = function(req, res) {
     } else {
         return res.json(400, {
             message: 'no email in request'
+        });
+    }
+};
+
+/**
+ * Change OneTime Password. This is only called once the user is logged in
+ */
+exports.changeOneTimePassword = function(req, res, next) {
+    // Init Variables
+    var passwordDetails = req.body;
+    var message = null;
+
+    if (req.user) {
+        User.findById(req.user.id, function(err, user) {
+            if (!err && user) {
+                if (passwordDetails.newPassword === passwordDetails.verifyPassword) {
+                    user.password = passwordDetails.newPassword;
+
+                    user.save(function(err) {
+                        if (err) {
+                            return res.send(400, {
+                                message: getErrorMessage(err)
+                            });
+                        } else {
+                            req.login(user, function(err) {
+                                if (err) {
+                                    res.send(400, err);
+                                } else {
+                                    res.send({
+                                        message: 'Password changed successfully'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    res.send(400, {
+                        message: 'Passwords do not match'
+                    });
+                }
+            } else {
+                res.send(400, {
+                    message: 'User is not found'
+                });
+            }
+        });
+    } else {
+        res.send(400, {
+            message: 'User is not signed in'
         });
     }
 };
