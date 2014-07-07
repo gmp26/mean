@@ -106,6 +106,8 @@ var UserSchema = new Schema({
         default: '',
         validate: [validateLocalStrategyPassword, 'Password should be longer']
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     affiliated: {
         type: Boolean,
         default: false,

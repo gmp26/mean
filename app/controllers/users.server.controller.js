@@ -13,21 +13,21 @@ var mongoose = require('mongoose'),
     debug = require('debug')('users');
 
 
-var oneTimes = {};
+// var oneTimes = {};
 
-function clearOneTime(email) {
-    var ot, tobj;
+// function clearOneTime(email) {
+//     var ot, tobj;
 
-    debug('deleting one time password ' + email);
+//     debug('deleting one time password ' + email);
 
-    // cancel the timeout
-    if ((ot = oneTimes[email]) && (tobj = ot[1])) {
-        clearTimeout(tobj);
+//     // cancel the timeout
+//     if ((ot = oneTimes[email]) && (tobj = ot[1])) {
+//         clearTimeout(tobj);
 
-        // delete the record from the oneTimes object
-        delete oneTimes[email];
-    }
-}
+//         // delete the record from the oneTimes object
+//         delete oneTimes[email];
+//     }
+// }
 
 /**
  * Get the error message from error object
@@ -39,7 +39,7 @@ var getErrorMessage = function(err) {
         switch (err.code) {
             case 11000:
             case 11001:
-                message = 'Username already exists';
+                message = 'Username or Email already exists';
                 break;
             default:
                 message = 'database error, code=' + err.code;
@@ -108,53 +108,81 @@ exports.signin = function(req, res, next) {
     // First check whether this is a one-time sign-in
     debug('req.body = ' + util.inspect(req.body));
 
+    // debugger;
+
     if (req.body) {
         var email = req.body.email;
         var password = req.body.password;
-        if (oneTimes) {
-            var ot = oneTimes[email];
-            if (ot && ot[0] === password) {
+        var oneTime = req.body.oneTime;
 
-                // clear the oneTime password timeout
-                clearTimeout(ot[1]);
-                delete oneTimes[email];
+        debug('email = ' + email);
+        debug('password = ' + password);
+        // debugger;
 
-                // fetch user details
-                return User.findOne({
-                    email: email
-                }).exec(function(err, user) {
-                    if (err) {
-                        debug(err);
-                        res.send(400, {
-                            message: 'Lookup failure on ' + email
-                        });
-                    } else {
+        // fetch user details
+        if (oneTime) {
+            return User.findOne({
+                email: email
+            }).exec(function(err, user) {
 
-                        // We need to set the session cookie so user
-                        // can be redirected to settings page.
 
-                        // Remove sensitive data before login
-                        user.password = undefined;
-                        user.salt = undefined;
+                if (err) {
+                    debug(err);
+                    res.send(400, {
+                        message: 'Lookup failure on ' + email
+                    });
+                } else {
 
-                        req.login(user, function(err) {
-                            if (err) {
-                                // debug('signin 400 failure');
-                                // debug(util.inspect(err));
-                                res.send(400, err);
-                            } else {
-                                res.jsonp(200, {
-                                    user: user
-                                });
-                            }
-                        });
+
+                    //
+                    // If this is a one-time-login we should have an in-date resetPasswordToken
+                    //
+                    if (user &&
+                        user.resetPasswordToken &&
+                        user.resetPasswordExpires.getTime() > Date.now()) {
+
+                        // The one-time request has happened! Need to forget about it.
+                        if (user.resetPasswordToken === password) {
+
+                            // Cancel the token
+                            user.resetPasswordToken = '';
+                            user.resetPasswordExpires = new Date().setTime(0);
+
+                            // and save the cancelled token 
+                            return user.save(function(err) {
+                                if (err) {
+                                    res.send(400, {
+                                        message: getErrorMessage(err)
+                                    });
+                                } else {
+                                    // We need to set the session cookie so user
+                                    // can be redirected to settings page.
+
+                                    // Remove sensitive data before login
+                                    user.password = undefined;
+                                    user.salt = undefined;
+
+                                    req.login(user, function(err) {
+                                        if (err) {
+                                            // debug('signin 400 failure');
+                                            // debug(util.inspect(err));
+                                            res.send(400, err);
+                                        } else {
+                                            res.jsonp(200, {
+                                                user: user
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
-                });
-            }
+                }
+            });
         }
+        // otherwise drop through to normal authenticate
     }
 
-    // otherwise drop through to normal authenticate
     passport.authenticate('local', function(err, user, info) {
         if (err) {
             debug('signin err = ' + err);
@@ -179,6 +207,85 @@ exports.signin = function(req, res, next) {
         }
     })(req, res, next);
 };
+
+// exports.signin = function(req, res, next) {
+//     debug('signin request');
+//     // First check whether this is a one-time sign-in
+//     debug('req.body = ' + util.inspect(req.body));
+
+//     if (req.body) {
+//         var email = req.body.email;
+//         var password = req.body.password;
+//         if (oneTimes) {
+//             var ot = oneTimes[email];
+//             if (ot && ot[0] === password) {
+
+//                 debugger;
+
+//                 // clear the oneTime password timeout
+//                 clearTimeout(ot[1]);
+//                 delete oneTimes[email];
+
+//                 // fetch user details
+//                 return User.findOne({
+//                     email: email
+//                 }).exec(function(err, user) {
+//                     if (err) {
+//                         debug(err);
+//                         res.send(400, {
+//                             message: 'Lookup failure on ' + email
+//                         });
+//                     } else {
+
+//                         // We need to set the session cookie so user
+//                         // can be redirected to settings page.
+
+//                         // Remove sensitive data before login
+//                         user.password = undefined;
+//                         user.salt = undefined;
+
+//                         req.login(user, function(err) {
+//                             if (err) {
+//                                 // debug('signin 400 failure');
+//                                 // debug(util.inspect(err));
+//                                 res.send(400, err);
+//                             } else {
+//                                 res.jsonp(200, {
+//                                     user: user
+//                                 });
+//                             }
+//                         });
+//                     }
+//                 });
+//             }
+//         }
+//     }
+
+//     // otherwise drop through to normal authenticate
+//     passport.authenticate('local', function(err, user, info) {
+//         if (err) {
+//             debug('signin err = ' + err);
+//             res.send(400, err);
+//         } else if (!user) {
+//             debug('no user ' + info.message);
+//             res.send(400, info);
+//         } else {
+//             // Remove sensitive data before login
+//             user.password = undefined;
+//             user.salt = undefined;
+
+//             req.login(user, function(err) {
+//                 if (err) {
+//                     // debug('signin 400 failure');
+//                     // debug(util.inspect(err));
+//                     res.send(400, err);
+//                 } else {
+//                     res.jsonp(user);
+//                 }
+//             });
+//         }
+//     })(req, res, next);
+// };
 
 
 /**
@@ -276,11 +383,14 @@ var smtpTransport = nodemailer.createTransport('SMTP', {
     }
 });
 
+/**
+ * return response email to a password reset request
+ */
 function resetMail(toEmail, oneTimePassword) {
     return {
         from: '<gmp26@cam.ac.uk>',
         to: toEmail,
-        subject: 'CMEP Password Reset Request (testing)',
+        subject: 'CMEP Password Reset Request',
         html: '<p>We received a password reset request for your CMEP account.</p>' +
             '<p>A new password has been generated for you which is good ' +
             'for one sign-in only within the next hour. ' +
@@ -289,11 +399,11 @@ function resetMail(toEmail, oneTimePassword) {
             '<p>Please sign in with this password. ' +
             'You will then be redirected to a page where you can choose a new password</p>' +
             '<p>If this password has already expired, you will be given an opportunity to request another.</p>'
-    }
+    };
 }
 
 function makeOneTimePassword() {
-    return crypto.randomBytes(12).toString('base64')
+    return crypto.randomBytes(12).toString('base64');
 }
 
 /**
@@ -312,36 +422,51 @@ exports.resetPassword = function(req, res) {
                     message: 'Lookup failure on ' + resetEmail
                 });
             } else {
+
                 // generate one-time password
-                var oneTime = makeOneTimePassword();
+                // var oneTime = makeOneTimePassword();
+                user.resetPasswordToken = makeOneTimePassword();
 
                 // start timeout on password
-                var timeout = setTimeout(clearOneTime, 1000 * 3600, resetEmail);
+                // var timeout = setTimeout(clearOneTime, 1000 * 3600, resetEmail);
 
                 // store one-time password along with timeoutObject
-                oneTimes[resetEmail] = [oneTime, timeout];
+                // oneTimes[resetEmail] = [oneTime, timeout];
 
-                // email user with password
-                // send mail with defined transport object
-                smtpTransport.sendMail(
-                    resetMail(user.email, oneTime),
-                    function(err, response) {
-                        if (err) {
-                            console.log(err);
-                            res.send(400, {
-                                message: 'unable to send email '
-                            });
-                        } else {
-                            console.log('Message sent: ' + response.message);
-                            // simple success displays instructions to user
-                            return res.json(200, {
-                                message: 'email sent '
-                            });
-                        }
-                        // if you don't want to use this transport object anymore, uncomment following line
-                        //smtpTransport.close(); // shut down the connection pool, no more messages
+                // Then save the one-time-password
+                user.resetPasswordExpires = new Date(Date.now() + 1000 * 3600);
+
+                user.save(function(err) {
+                    if (err) {
+                        return res.send(400, getErrorMessage(err));
+                    } else {
+                        // Remove sensitive data (?)
+                        user.password = undefined;
+                        user.salt = undefined;
+
+                        // email user with password
+                        // send mail with defined transport object
+                        smtpTransport.sendMail(
+                            resetMail(user.email, user.resetPasswordToken),
+                            function(err, response) {
+                                if (err) {
+                                    console.log(err);
+                                    res.send(400, {
+                                        message: 'unable to send email '
+                                    });
+                                } else {
+                                    console.log('Message sent: ' + response.message);
+                                    // simple success displays instructions to user
+                                    return res.json(200, {
+                                        message: 'email sent '
+                                    });
+                                }
+                                // if you don't want to use this transport object anymore, uncomment following line
+                                //smtpTransport.close(); // shut down the connection pool, no more messages
+                            }
+                        );
                     }
-                );
+                });
             }
         });
     } else {
