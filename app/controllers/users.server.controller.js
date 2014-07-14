@@ -345,6 +345,21 @@ exports.update = function(req, res) {
     if (user) {
         // Merge existing user
         user = _.extend(user, req.body);
+
+        var s = user.school;
+        if (s) {
+            user.schoolurn = '' + s.urn;
+            user.schoolname = s.name;
+            user.schooladdr1 = s.addr1;
+            user.schooladdr2 = s.addr2;
+            user.schooladdr3 = s.addr3;
+            user.schooltown = s.town;
+            user.schoolpostCode = s.postCode;
+        }
+
+        debug('extending user with req.body');
+        debug(util.inspect(req.body));
+
         user.updated = Date.now();
         user.displayName = user.firstName + ' ' + user.lastName;
         user.username = user.email;

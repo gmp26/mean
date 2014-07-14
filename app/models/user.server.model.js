@@ -44,7 +44,7 @@ var validateAffiliated = function(checked) {
 };
 
 var validateTitle = function(title) {
-    var whiteList = ['Mr', 'Mrs', 'Ms', 'Miss', 'Dr'];
+    var whiteList = ['', 'Mr', 'Mrs', 'Ms', 'Miss', 'Dr'];
     return (this.provider !== 'local' || whiteList.indexOf(title) >= 0);
 };
 
