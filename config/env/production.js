@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    db: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/mean',
+    db: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://localhost/fenman',
     assets: {
         lib: {
             css: [
@@ -41,29 +41,5 @@ module.exports = {
         callbackURL: 'http://localhost:3000/mean/auth/linkedin/callback'
     }
 
-    /*
-var nodemailer = require("nodemailer");
-var smtpTransport = nodemailer.createTransport("SMTP");
-
-var mailOptions = {
-   from: "<ogs22@cam.ac.uk>", // sender address
-   to: "ogg@shrunk.com", // list of receivers
-   subject: "Hello ", // Subject line
-   text: "Hello world ", // plaintext body
-   html: "<b>Hello world </b>" // html body
-}
-
-// send mail with defined transport object
-smtpTransport.sendMail(mailOptions, function(error, response){
-   if(error){
-       console.log(error);
-   }else{
-       console.log("Message sent: " + response.message);
-   }
-
-   // if you don't want to use this transport object anymore, uncomment following line
-   //smtpTransport.close(); // shut down the connection pool, no more messages
-});
-*/
 
 };

@@ -10,8 +10,8 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User'),
     _ = require('lodash'),
     util = require('util'),
+    mailouts = require('../../config/mailouts'),
     debug = require('debug')('users');
-
 
 // var oneTimes = {};
 
@@ -388,34 +388,34 @@ exports.update = function(req, res) {
 
 // This is an example that works on the server:
 
-var smtpTransport = nodemailer.createTransport('SMTP', {
-    host: 'smtp.hermes.cam.ac.uk',
-    port: 587,
-    debug: true,
-    auth: {
-        user: process.env.crsid,
-        pass: process.env.hermesPassword
-    }
-});
+// var smtpTransport = nodemailer.createTransport('SMTP', {
+//     host: 'smtp.hermes.cam.ac.uk',
+//     port: 587,
+//     debug: true,
+//     auth: {
+//         user: process.env.crsid,
+//         pass: process.env.hermesPassword
+//     }
+// });
 
-/**
- * return response email to a password reset request
- */
-function resetMail(toEmail, oneTimePassword) {
-    return {
-        from: '<gmp26@cam.ac.uk>',
-        to: toEmail,
-        subject: 'CMEP Password Reset Request',
-        html: '<p>We received a password reset request for your CMEP account.</p>' +
-            '<p>A new password has been generated for you which is good ' +
-            'for one sign-in only within the next hour. ' +
-            'Your one-time password is</p>' +
-            '<div style="font-weight:bold;font-size:1.8em">' + oneTimePassword + '</div>' +
-            '<p>Please sign in with this password. ' +
-            'You will then be redirected to a page where you can choose a new password</p>' +
-            '<p>If this password has already expired, you will be given an opportunity to request another.</p>'
-    };
-}
+// /**
+//  * return response email to a password reset request
+//  */
+// function resetMail(toEmail, oneTimePassword) {
+//     return {
+//         from: '<gmp26@cam.ac.uk>',
+//         to: toEmail,
+//         subject: 'CMEP Password Reset Request',
+//         html: '<p>We received a password reset request for your CMEP account.</p>' +
+//             '<p>A new password has been generated for you which is good ' +
+//             'for one sign-in only within the next hour. ' +
+//             'Your one-time password is</p>' +
+//             '<div style="font-weight:bold;font-size:1.8em">' + oneTimePassword + '</div>' +
+//             '<p>Please sign in with this password. ' +
+//             'You will then be redirected to a page where you can choose a new password</p>' +
+//             '<p>If this password has already expired, you will be given an opportunity to request another.</p>'
+//     };
+// }
 
 function makeOneTimePassword() {
     return crypto.randomBytes(12).toString('base64');
@@ -461,8 +461,8 @@ exports.resetPassword = function(req, res) {
 
                         // email user with password
                         // send mail with defined transport object
-                        smtpTransport.sendMail(
-                            resetMail(user.email, user.resetPasswordToken),
+                        mailOuts.sendMail(
+                            mailOuts.sendOneTimePassword(user.email, user.resetPasswordToken),
                             function(err, response) {
                                 if (err) {
                                     console.log(err);
@@ -480,6 +480,25 @@ exports.resetPassword = function(req, res) {
                                 //smtpTransport.close(); // shut down the connection pool, no more messages
                             }
                         );
+                        // smtpTransport.sendMail(
+                        //     resetMail(user.email, user.resetPasswordToken),
+                        //     function(err, response) {
+                        //         if (err) {
+                        //             console.log(err);
+                        //             res.send(400, {
+                        //                 message: 'unable to send email '
+                        //             });
+                        //         } else {
+                        //             console.log('Message sent: ' + response.message);
+                        //             // simple success displays instructions to user
+                        //             return res.json(200, {
+                        //                 message: 'email sent '
+                        //             });
+                        //         }
+                        //         // if you don't want to use this transport object anymore, uncomment following line
+                        //         //smtpTransport.close(); // shut down the connection pool, no more messages
+                        //     }
+                        // );
                     }
                 });
             }
