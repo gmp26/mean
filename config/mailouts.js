@@ -3,7 +3,7 @@
 var nodemailer = require('nodemailer'),
     config = require('./config'),
     production = process.env.NODE_ENV === 'production',
-    sender = production ? 'cmep@maths.org' : 'gmp26@cam.ac.uk',
+    sender = production ? 'ogs22@cam.ac.uk' : 'gmp26@cam.ac.uk',
     smtpTransport;
 
 if (production) {
