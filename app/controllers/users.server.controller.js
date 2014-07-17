@@ -461,8 +461,8 @@ exports.resetPassword = function(req, res) {
 
                         // email user with password
                         // send mail with defined transport object
-                        mailOuts.sendMail(
-                            mailOuts.sendOneTimePassword(user.email, user.resetPasswordToken),
+                        mailouts.sendMail(
+                            mailouts.sendOneTimePassword(user.email, user.resetPasswordToken),
                             function(err, response) {
                                 if (err) {
                                     console.log(err);
