@@ -440,6 +440,14 @@ exports.resetPassword = function(req, res) {
 
                 // generate one-time password
                 // var oneTime = makeOneTimePassword();
+
+                // TODO: guard agains possibly null user!
+                if (!user) {
+                    return res.json(400, {
+                        message: 'email not recognised'
+                    });
+                }
+                
                 user.resetPasswordToken = makeOneTimePassword();
 
                 // start timeout on password
