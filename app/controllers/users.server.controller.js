@@ -57,7 +57,7 @@ var getErrorMessage = function(err) {
  * Signup
  */
 exports.signup = function(req, res) {
-    // For security measurement we remove the roles from the req.body object
+    // For security measure we remove the roles from the req.body object
 
     delete req.body.roles;
 
@@ -85,6 +85,7 @@ exports.signup = function(req, res) {
         if (err) {
             return res.send(400, getErrorMessage(err));
         } else {
+
             // Remove sensitive data before login
             user.password = undefined;
             user.salt = undefined;
@@ -488,25 +489,7 @@ exports.resetPassword = function(req, res) {
                                 //smtpTransport.close(); // shut down the connection pool, no more messages
                             }
                         );
-                        // smtpTransport.sendMail(
-                        //     resetMail(user.email, user.resetPasswordToken),
-                        //     function(err, response) {
-                        //         if (err) {
-                        //             console.log(err);
-                        //             res.send(400, {
-                        //                 message: 'unable to send email '
-                        //             });
-                        //         } else {
-                        //             console.log('Message sent: ' + response.message);
-                        //             // simple success displays instructions to user
-                        //             return res.json(200, {
-                        //                 message: 'email sent '
-                        //             });
-                        //         }
-                        //         // if you don't want to use this transport object anymore, uncomment following line
-                        //         //smtpTransport.close(); // shut down the connection pool, no more messages
-                        //     }
-                        // );
+
                     }
                 });
             }
@@ -661,7 +644,8 @@ exports.oauthCallback = function(strategy) {
 };
 
 /**
- * User middleware
+ * User middleware: find user by ID, annotating request with list
+ * of admins and moderators
  */
 exports.userByID = function(req, res, next, id) {
     User.findOne({
@@ -672,6 +656,49 @@ exports.userByID = function(req, res, next, id) {
         req.profile = user;
         next();
     });
+};
+
+/**
+ * Query builders returning queries for subsets of users
+ */
+exports.getAdminsQuery = function() {
+    User.find({
+        roles: {$in: ['admin']}
+    })
+};
+
+exports.getModeratorsQuery = function() {
+    User.find({
+        roles: {$in: ['moderator']}
+    })
+};
+
+exports.getAdminsOnlyQuery = function() {
+    Users.find({
+        $and: [ 
+            {roles: {$in: ['admin']}}, 
+            {roles: {$nin: ['moderator']}}
+        ]})
+};
+
+exports.getModeratorsOnlyQuery = function() {
+    Users.find({
+        $and: [ 
+            {roles: {$in: ['moderator']}}, 
+            {roles: {$nin: ['admin']}} 
+        ]})
+};
+
+exports.getAdminsOrModeratorsQuery = function() {
+    Users.find({
+        roles: {$in: ['admin', 'moderator']}
+    })
+};
+
+exports.getAdminsAndModeratorsQuery = function() {
+    Users.find({
+        roles: {$in: ['admin', 'moderator']}
+    })
 };
 
 /**
