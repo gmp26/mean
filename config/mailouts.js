@@ -80,7 +80,7 @@ function spotUrl(spotId) {
     if (m)
         return 'https://cmep.maths.org/' + apath;
     else
-        return 'http://localhost:9000/' + apath;
+        return 'http://localhost:9000' + apath;
 }
 
 function addReason(text) {

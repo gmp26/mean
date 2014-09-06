@@ -196,9 +196,9 @@ exports.delete = function(req, res) {
  */
 exports.deleteReply = function(req, res) {
     var comment = req.comment;
-    var replyIndex = req.replyIndex
+    var replyIndex = req.replyIndex;
 
-    comment.replies.splice(replyIndex, 1)
+    comment.replies.splice(replyIndex, 1);
 
     debug('deleting reply at index :' + replyIndex);
     // debug(util.inspect(comment));
@@ -253,16 +253,16 @@ exports.commentByID = function(req, res, next, id) {
  * Comment middleware
  */
 exports.replyId = function(req, res, next, id) {
-    ids = split(':', id);
-    commentId = ids[0];
-    replyIndex = ids[1];
-    debug('findById comment ' + commentId + " replyIndex = " + replyIndex);
+    var ids = id.split(':');
+    var commentId = ids[0];
+    var replyIndex = ids[1];
+    debug('findById comment ' + commentId + ' replyIndex = ' + replyIndex);
     Comment.findById(id).populate('user', 'email displayName').exec(function(err, comment) {
         if (err) return next(err);
         if (!comment) return next(new Error('Failed to load comment ' + id));
         req.comment = comment;
         if (replyIndex < 0 || replyIndex >= comment.replies.length)
-             return next(new Error('Reply Index out of range on comment ' + id + " reply " + replyIndex));
+             return next(new Error('Reply Index out of range on comment ' + id + ' reply ' + replyIndex));
         req.replyIndex = replyIndex;
         next();
     });
