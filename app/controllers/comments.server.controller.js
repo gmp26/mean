@@ -4,6 +4,7 @@
  */
 var mongoose = require('mongoose'),
     Comment = mongoose.model('Comment'),
+    mailouts = require('../../config/mailouts'),
     _ = require('lodash');
 
 var debug = require('debug')('comments');
@@ -47,6 +48,9 @@ exports.create = function(req, res) {
     comment.title = req.body.title;
     comment.content = req.body.content;
 
+    debug('spotId = ' + comment.spotId);
+    debug('commenting user = ' + util.inspect(req.user));
+
     comment.save(function(err) {
         if (err) {
             return res.send(400, {
@@ -54,6 +58,19 @@ exports.create = function(req, res) {
             });
         } else {
             res.jsonp(comment);
+
+            // email moderator(s)
+            // send mail with defined transport object
+            mailouts.sendMail(
+                mailouts.newCommentNotification(comment, req.user),
+                function(err, response) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('Message sent: ' + response.message);
+                    }
+                }
+            );
         }
     });
 };
@@ -70,7 +87,10 @@ exports.read = function(req, res) {
  */
 exports.update = function(req, res) {
     var comment = req.comment;
-
+    var oldComment = {
+        title: comment.title,
+        content: comment.content
+    };
     comment.content = req.query.content;
     comment.title = req.query.title;
 
@@ -84,6 +104,18 @@ exports.update = function(req, res) {
             });
         } else {
             res.jsonp(comment);
+
+            // email moderator(s)
+            mailouts.sendMail(
+                mailouts.editNotification(comment, req.user, oldComment),
+                function(err, response) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('Message sent: ' + response.message);
+                    }
+                }
+            );
         }
     });
 };
@@ -109,6 +141,18 @@ exports.appendReply = function(req, res) {
             });
         } else {
             res.jsonp(comment);
+
+            // email moderator(s)
+            mailouts.sendMail(
+                mailouts.newReplyNotification(comment, req.user, req.query.reply),
+                function(err, response) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('Message sent: ' + response.message);
+                    }
+                }
+            );
         }
     });
 };
@@ -119,12 +163,27 @@ exports.appendReply = function(req, res) {
 exports.delete = function(req, res) {
     var comment = req.comment;
 
+    debug('deleting: ' + util.inspect(comment));
+    debug('deleting user =: ' + util.inspect(req.user));
+
     comment.remove(function(err) {
         if (err) {
             return res.send(400, {
                 message: getErrorMessage(err)
             });
         } else {
+            // email moderator(s)
+            mailouts.sendMail(
+                mailouts.deleteNotification(comment, req.user),
+                function(err, response) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('Message sent: ' + response.message);
+                    }
+                }
+            );
+
             res.jsonp(comment);
         }
     });
@@ -204,9 +263,9 @@ function ageInMinutes(comment) {
  * Comment authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-    // authorise edits for admin users, and creators for 10 minutes if there are no replies
+    // authorise edits for admin users, and creators for 60 minutes if there are no replies
     var ok = req.comment.user.id === req.user.id;
-    ok = ok && ageInMinutes(req.comment) <= 10;
+    ok = ok && ageInMinutes(req.comment) <= 60;
     ok = ok && !req.comment.replies || !req.comment.replies.length;
     ok = ok || _.contains(req.user.roles, 'admin');
     // debug(ok);

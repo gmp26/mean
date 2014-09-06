@@ -3,8 +3,58 @@
 var nodemailer = require('nodemailer'),
     config = require('./config'),
     production = process.env.NODE_ENV === 'production',
-    sender = production ? 'gmp26@cam.ac.uk' : 'gmp26@cam.ac.uk',
+    mongoose = require('mongoose'),
+    User = mongoose.model('User'),
+    _ = require('lodash'),
     smtpTransport;
+
+var debug = require('debug')('comments');
+var util = require('util');
+
+//
+// Update the mail sender and the moderators list every so often
+//
+var sender = '';
+var moderators = '';
+
+function setSenderAndModerators() {
+    User
+        .findOne({
+            roles: 'sender'
+        })
+        .select('email')
+        .exec(function(err, user) {
+            if (err) {
+                debug('error ' + err + 'finding designated mailout sender');
+            } else {
+                if (user) {
+                    sender = user.email;
+                } else {
+                    sender = 'gmp26@cam.ac.uk';
+                    debug('no sender assigned: using ' + sender);
+                }
+                debug('sender = ' + sender);
+            }
+        });
+
+    User
+        .find({
+            roles: 'moderator'
+        })
+        .select('email')
+        .exec(function(err, mods) {
+            if (err) return;
+            moderators = _.map(mods, 'email').join(', ');
+            if (moderators.length === 0) {
+                moderators = 'gmp26@cam.ac.uk';
+                debug('no moderators assigned: using ' + moderators);
+            }
+            debug('moderators = ' + moderators);
+        });
+}
+setSenderAndModerators();
+setInterval(setSenderAndModerators, 15000);
+
 
 if (production) {
     smtpTransport = nodemailer.createTransport('SMTP');
@@ -20,9 +70,28 @@ if (production) {
     });
 }
 
+function spotUrl(spotId) {
+    var m;
+    var apath;
+    //debug('spotId=' + spotId);
+    apath = spotId + (spotId.match('/resources/') ? '/index.html' : '.html');
+
+    m = spotId.match(/(fenman)|(bittern)|(swanage)/);
+    if (m)
+        return 'https://cmep.maths.org/' + apath;
+    else
+        return 'http://localhost:9000/' + apath;
+}
+
+function addReason(text) {
+    return text + '\nYou are receiving this email because you are a CMEP comment moderator.';
+}
+
 module.exports = {
 
     sendMail: smtpTransport.sendMail,
+
+    setSenderAndModerators: setSenderAndModerators,
 
     sendOneTimePassword: function(toEmail, oneTimePassword) {
         return {
@@ -40,64 +109,45 @@ module.exports = {
         };
     },
 
-    newCommentNotification: function(toEmail, recipients, url, commenter, markdown) {
+    newCommentNotification: function(comment, user) {
         return {
             from: sender,
-            to: recipients,
-            subject: 'New comment at ' + url + ' from ' + commenter,
-            text: markdown
+            to: moderators,
+            subject: 'cm!c ' + user.displayName + ' commented on ' + spotUrl(comment.spotId),
+            text: addReason(
+                'from: ' + user.email + '\n title:' + comment.title + '\n\n' + comment.content
+            )
         };
     },
 
-    newReplyNotification: function(toEmail, recipients, url, commenter, markdown) {
+    newReplyNotification: function(comment, user, reply) {
         return {
             from: sender,
-            to: recipients,
-            subject: 'New comment at ' + url + ' from ' + commenter,
-            text: markdown
+            to: moderators,
+            subject: 'cm!r new reply to ' + comment.title + ' at ' + spotUrl(comment.spotId),
+            text: addReason(reply)
         };
     },
 
-    editNotification: function(toEmail, recipients, url, commenter, markdown) {
+    editNotification: function(comment, editingUser, oldComment) {
         return {
             from: sender,
-            to: recipients,
-            subject: 'Edited comment at ' + url + ' from ' + commenter,
-            text: markdown
+            to: moderators,
+            subject: 'cm!e ' + editingUser.email + ' edited comment at ' + spotUrl(comment.spotId),
+            text: addReason(
+                'OLD\n===\n' + util.inspect(oldComment) + '\nNEW\n===\n' + util.inspect(comment)
+            )
         };
     },
 
-    deleteNotification: function(toEmail, recipients, url, commenter, markdown) {
+    deleteNotification: function(comment, deletingUser) {
         return {
             from: sender,
-            to: recipients,
-            subject: 'Deleted comment at ' + url + ' from ' + commenter,
-            text: markdown
+            to: moderators,
+            subject: 'cm!d ' + deletingUser.email + ' deleted comment at ' + spotUrl(comment.spotId),
+            text: addReason(
+                util.inspect(comment)
+            )
         };
     }
 };
-
-/*
-var nodemailer = require("nodemailer");
-var smtpTransport = nodemailer.createTransport("SMTP");
-
-var mailOptions = {
-   from: "<ogs22@cam.ac.uk>", // sender address
-   to: "ogg@shrunk.com", // list of receivers
-   subject: "Hello ", // Subject line
-   text: "Hello world ", // plaintext body
-   html: "<b>Hello world </b>" // html body
-}
-
-// send mail with defined transport object
-smtpTransport.sendMail(mailOptions, function(error, response){
-   if(error){
-       console.log(error);
-   }else{
-       console.log("Message sent: " + response.message);
-   }
-
-   // if you don't want to use this transport object anymore, uncomment following line
-   //smtpTransport.close(); // shut down the connection pool, no more messages
-});
-*/
