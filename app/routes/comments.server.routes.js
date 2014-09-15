@@ -18,7 +18,7 @@ module.exports = function(app) {
         .get(comments.read)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
 
-    app.route('/comment/reply/:replyId')
+    app.route('/comment/reply/:commentId/:replyId')
         // .put(users.requiresLogin, comments.hasAuthorization, comments.updateReply)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.deleteReply);
 

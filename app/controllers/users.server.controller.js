@@ -660,7 +660,7 @@ exports.userByID = function(req, res, next, id) {
 
 /**
  * Query builders returning queries for subsets of users
- */
+
 exports.getAdminsQuery = function() {
     User.find({
         roles: {$in: ['admin']}
@@ -700,6 +700,7 @@ exports.getAdminsAndModeratorsQuery = function() {
         roles: {$in: ['admin', 'moderator']}
     })
 };
+*/
 
 /**
  * Require login routing middleware
