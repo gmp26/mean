@@ -256,12 +256,12 @@ exports.replyId = function(req, res, next, commentId, replyId) {
     debug('findById arg count = ' + arguments.length);
     replyId = ~~replyId;    // convert to number
     debug('findById comment ' + commentId + ' replyId = ' + replyId);
-    Comment.findById(id).populate('user', 'email displayName').exec(function(err, comment) {
+    Comment.findById(commentId).populate('user', 'email displayName').exec(function(err, comment) {
         if (err) return next(err);
-        if (!comment) return next(new Error('Failed to load comment ' + id));
+        if (!comment) return next(new Error('Failed to load comment ' + commentId));
         req.comment = comment;
         if (replyId < 0 || replyId >= comment.replies.length)
-             return next(new Error('Reply Index out of range on comment ' + id + ' reply ' + replyId));
+             return next(new Error('Reply Index out of range on comment ' + commentId + ' reply ' + replyId));
         req.replyId = replyId;
         next();
     });
