@@ -201,8 +201,7 @@ exports.deleteReply = function(req, res) {
     comment.replies.splice(replyIndex, 1);
 
     debug('deleting reply at index :' + replyIndex);
-    // debug(util.inspect(comment));
-
+ 
     comment.save(function(err) {
         if (err) {
             return res.send(400, {
