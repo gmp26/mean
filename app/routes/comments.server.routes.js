@@ -18,7 +18,7 @@ module.exports = function(app) {
         .get(comments.read)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.delete);
 
-    app.route('/comment/reply/:commentId/:replyId')
+    app.route('/comment/reply/:replyId')
         // .put(users.requiresLogin, comments.hasAuthorization, comments.updateReply)
         .delete(users.requiresLogin, comments.hasAuthorization, comments.deleteReply);
 
@@ -36,5 +36,5 @@ module.exports = function(app) {
     });
 
     app.param('commentId', comments.commentByID);
-    app.param('replyId', comments.replyId);
+    app.param('replyId', comments.replyByID);
 };

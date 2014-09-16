@@ -242,30 +242,55 @@ exports.list = function(req, res) {
 exports.commentByID = function(req, res, next, id) {
     debug('findById comment ' + id);
     Comment.findById(id).populate('user', 'email displayName').exec(function(err, comment) {
-        if (err) return next(err);
-        if (!comment) return next(new Error('Failed to load comment ' + id));
+        //if (err) return next(err);
+        if (err || !comment)  {
+            console.log('commentByID failed to find comment ' + id);
+            return res.send(400, {
+                message: 'Failed to find comment'
+            });
+        }
         req.comment = comment;
         next();
     });
 };
 
+
 /**
  * Comment middleware
  */
-exports.replyId = function(req, res, next, commentId, replyId) {
-    debug('findById arg count = ' + arguments.length);
-    replyId = ~~replyId;    // convert to number
-    debug('findById comment ' + commentId + ' replyId = ' + replyId);
+exports.replyByID = function(req, res, next, id) {
+    var ids = id.split('.');
+    if(ids.length !== 2) {
+        // TODO: log the error. Simplify user error
+        console.log('invalid comment.replyId ' + id);
+        return res.send(400, {
+            message: 'invalid comment.replyId ' + id
+        });
+    }
+    var commentId = ids[0];
+    var replyIndex = ids[1];
+    debug('findById comment ' + commentId + ' replyIndex = ' + replyIndex);
     Comment.findById(commentId).populate('user', 'email displayName').exec(function(err, comment) {
-        if (err) return next(err);
-        if (!comment) return next(new Error('Failed to load comment ' + commentId));
+        // if (err) return next(err);
+        if (err || !comment)   {
+            console.log('replyByID failed to find comment ' + commentId);
+            return res.send(400, {
+                message: 'Failed to find comment'
+            });
+        }
         req.comment = comment;
-        if (replyId < 0 || replyId >= comment.replies.length)
-             return next(new Error('Reply Index out of range on comment ' + commentId + ' reply ' + replyId));
-        req.replyId = replyId;
+        if (replyIndex < 0 || replyIndex >= comment.replies.length)   {
+            console.log('replyByID replyIndex out of range ' + id);
+            return res.send(400, {
+                message: 'Failed to find reply'
+            });
+        }
+        req.replyIndex = replyIndex;
         next();
     });
 };
+
+
 
 /**
  * Upvote a comment
